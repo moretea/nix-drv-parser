@@ -1,0 +1,8 @@
+[package]
+name = "nix-drv-parser"
+version = "0.1.0"
+authors = ["Maarten Hoogendoorn <maarten@moretea.nl>"]
+build = "build.rs"
+
+[build-dependencies]
+peg = { version = "0.5" }

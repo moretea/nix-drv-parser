@@ -1,0 +1,4 @@
+Derive(
+[("out", "output_path", "hash_algo", "hash")],
+[("/path",["output_names"])],
+

@@ -1,0 +1,71 @@
+use std::collections::HashMap;
+use super::{Derivation, Output, DerivationRef};
+
+pub derivation -> Derivation
+= "Derive("
+       outputs:outputs
+   "," inputs:inputs
+   "," input_sources: str_list
+   "," platform: string
+   "," builder: string
+   "," builder_arguments: str_list
+   "," environment:env
+   ")" {
+       Derivation {
+           outputs: outputs,
+           inputs: inputs,
+           input_sources: input_sources,
+           platform: platform,
+           builder: builder,
+           builder_arguments: builder_arguments,
+           environment: environment
+       }
+   }
+
+outputs -> Vec<Output>
+    = "[" x:output_rep "]" { x }
+
+output_rep -> Vec<Output>
+    = output ** ","
+
+output -> Output
+    = "(" id:string "," path:string "," hash_algo:string "," hash:string ")" {
+            Output {
+                id:id,
+                path: path,
+                hash_algorithm: hash_algo,
+                hash: hash
+           }
+        }
+
+inputs -> Vec<DerivationRef>
+    = "[" x:inputs_rep "]" { x }
+
+inputs_rep-> Vec<DerivationRef>
+    = input ** ","
+
+input -> DerivationRef
+    = "(" path:string "," outputs:str_list ")"  { DerivationRef { path: path, outputs: outputs } }
+
+pub string -> String
+    = "\"" x: $(("\\\"" / (!"\\\"" [^"]))*) "\"" { x.into() }
+
+str_list -> Vec<String>
+    = "[" x:str_list_rep "]" { x }
+
+str_list_rep -> Vec<String>
+    = string ** ","
+
+env -> HashMap<String, String>
+    = "[" x:env_rep "]" { x }
+
+env_rep -> HashMap<String, String>
+    = kvs:env_keyval ** ","  {
+        let mut rv = HashMap::new();
+        for &(ref k, ref v) in kvs.iter() {
+           rv.insert(k.clone(), v.clone());
+        };
+        rv
+    }
+
+env_keyval -> (String, String) = "(" k:string "," v:string ")" { (k.into(), v.into()) }
